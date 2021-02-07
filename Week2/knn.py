@@ -72,6 +72,17 @@ if __name__ == "__main__":
 
         accuracy_list = []
 
+        
+        interval = []
+        for column in train_data.columns:
+            interval.append(train_data[column].max() - train_data[column].min())
+        print("Max interval train data: {}".format(max(interval)))
+
+        interval = []
+        for column in test_data.columns:
+            interval.append(test_data[column].max() - test_data[column].min())
+        print("Max interval test data: {}".format(max(interval)))
+
         for k in k_list:
             hit_count = 0
 
