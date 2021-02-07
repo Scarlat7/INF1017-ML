@@ -70,9 +70,6 @@ if __name__ == "__main__":
         train_data,train_outcomes = get_partition_of_dataset(train_file)
         test_data,test_outcomes = get_partition_of_dataset(test_file)
 
-        accuracy_list = []
-
-        
         interval = []
         for column in train_data.columns:
             interval.append(train_data[column].max() - train_data[column].min())
@@ -83,6 +80,7 @@ if __name__ == "__main__":
             interval.append(test_data[column].max() - test_data[column].min())
         print("Max interval test data: {}".format(max(interval)))
 
+        accuracy_list = []
         for k in k_list:
             hit_count = 0
 
