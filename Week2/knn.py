@@ -55,10 +55,38 @@ def evaluate_test_point(point,data,outcomes,k):
 ## Input:   file - file name containing dataset - string
 ## Output:  data attributes and target outcomes
 def get_partition_of_dataset(file):
-        df = pd.read_csv(file)
-        data = df.iloc[: , :df.shape[COLUMNS]-1]
-        outcomes = df.iloc[: , df.shape[COLUMNS]-1]
-        return data, outcomes
+    df = pd.read_csv(file)
+    data = df.iloc[: , :df.shape[COLUMNS]-1]
+    outcomes = df.iloc[: , df.shape[COLUMNS]-1]
+    return data, outcomes
+
+## Returns the max interval between all attributes
+## Input:   data - the data frame to be analysed
+## Output:  double - max interval between any attribute
+def calculate_max_interval(data):
+    interval = []
+    for column in data.columns:
+        interval.append(data[column].max() - data[column].min())
+        print(data[column].max())
+        print(column)
+    print(data['28'].to_string())
+    return max(interval)
+
+## Produce results for the model (print accuracy values and saved graph)
+## Input:   k_list : list with k values
+##          accuracy_list : list with accuracy values
+##          file_name : file name for the graph picture
+## Output:  none
+produce_results(k_list, accuracy_list, file_name = 'result.png'):
+    print("K values: {}".format(k_list))
+    print("Accuracy values: {}".format(accuracy_list))
+    
+    fig = plt.figure()
+    fig.suptitle('KNN Evaluation')
+    plt.plot(k_list, accuracy_list)
+    plt.xlabel("K")
+    plt.ylabel("Accuracy")
+    fig.savefig(file_name)
 
 if __name__ == "__main__":
     if len(sys.argv) == NB_ARGUMENTS:
@@ -70,15 +98,9 @@ if __name__ == "__main__":
         train_data,train_outcomes = get_partition_of_dataset(train_file)
         test_data,test_outcomes = get_partition_of_dataset(test_file)
 
-        interval = []
-        for column in train_data.columns:
-            interval.append(train_data[column].max() - train_data[column].min())
-        print("Max interval train data: {}".format(max(interval)))
-
-        interval = []
-        for column in test_data.columns:
-            interval.append(test_data[column].max() - test_data[column].min())
-        print("Max interval test data: {}".format(max(interval)))
+        print("Max interval train data: {}".format(calculate_max_interval(train_data)))
+        exit()
+        print("Max interval test data: {}".format(calculate_max_interval(test_data)))
 
         accuracy_list = []
         for k in k_list:
@@ -91,14 +113,6 @@ if __name__ == "__main__":
             accuracy = hit_count/test_outcomes.shape[ROWS]
             accuracy_list.append(accuracy)
         
-        print("K values: {}".format(k_list))
-        print("Accuracy values: {}".format(accuracy_list))
-        fig = plt.figure()
-        fig.suptitle('KNN Evaluation')
-        plt.plot(k_list, accuracy_list)
-        plt.xlabel("K")
-        plt.ylabel("Accuracy")
-        fig.savefig('result.png')
-
+        produce_results(k_list, accuracy_list)
     else:
         print("Wrong number of arguments ({}). Please use script as python knn.py <train_file_name> <test_file_name> <k-list>. E.g.: knn.py train.csv test.csv [1,3,5,7]".format(len(sys.argv)))
