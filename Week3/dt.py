@@ -6,13 +6,15 @@ import pandas as pd
 import sys
 from sklearn import tree
 from sklearn.model_selection import train_test_split
+from graphviz import Source
+from sklearn import tree
 
 # For numpy shapes method
 COLUMNS = 1
 ROWS = 0
 
 # For sklearn train_test_split, means the random holdout will be the same across executions
-NO_RANDOM = 1
+NO_RANDOM = 0
 
 NB_ARGUMENTS = 2
 
@@ -20,10 +22,10 @@ NB_ARGUMENTS = 2
 TRAIN_DATA_PERCENTAGE = 0.8
 GINI = "gini"
 ENTROPY = "entropy"
-CRITERION = GINI
+CRITERION = ENTROPY
 MAX_DEPTH_TREE = None
 MIN_SAMPLES_LEAF = 1 #2#3
-PRUNING_COMPLEXITY = 0 #0.1 #0.2
+PRUNING_COMPLEXITY = 0 #0.01 #0.05 #0.1
 
 ## Returns partition of dataset into attributes and target outcomes
 ## Input:   df - data frame containing dataset
@@ -58,7 +60,8 @@ if __name__ == "__main__":
         decision_tree = tree.DecisionTreeClassifier(criterion = CRITERION,
                                                     max_depth = MAX_DEPTH_TREE,
                                                     min_samples_leaf = MIN_SAMPLES_LEAF,
-                                                    ccp_alpha = PRUNING_COMPLEXITY)
+                                                    ccp_alpha = PRUNING_COMPLEXITY,
+                                                    random_state = NO_RANDOM)
         decision_tree = decision_tree.fit(train_data, train_outcomes)
         predict_outcomes = decision_tree.predict(test_data)
 
@@ -71,6 +74,10 @@ if __name__ == "__main__":
         Minimum samples in leaf: {}\n \
         Pruning complexity: {}\n \
         Accuray:{}".format(TRAIN_DATA_PERCENTAGE,CRITERION,MAX_DEPTH_TREE,MIN_SAMPLES_LEAF,PRUNING_COMPLEXITY,accuracy))
+
+        graph = Source( tree.export_graphviz(decision_tree, out_file=None, feature_names=X.columns,filled=True))
+        graph.format = 'png'
+        graph.render('Results/tree_c{}_md{}_msl{}_p{}'.format(CRITERION,MAX_DEPTH_TREE,MIN_SAMPLES_LEAF,PRUNING_COMPLEXITY),view=False)
     else:
         print("Wrong number of arguments ({}). Please use script as python dt.py <data_file_name>. E.g.: dt.py vote.tsv".format(len(sys.argv)))
 
